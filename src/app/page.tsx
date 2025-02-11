@@ -6,7 +6,7 @@ export default function Home() {
       <Stack component="form" gap="md" w="90%" maw={500}>
         <TextInput label="E-mail" required />
 
-        <PasswordInput label="Password" required />
+        <PasswordInput label="Senha" required />
 
         <Button color="teal" mt="xs">
           Login
