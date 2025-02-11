@@ -7,13 +7,14 @@ import {
   Checkbox,
   Group,
   Modal,
+  ModalStack,
   NativeSelect,
   NumberInput,
   Stack,
   Table,
   TextInput,
+  useModalsStack,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import { PlusIcon, SquarePen, Trash } from "lucide-react";
 import { useState } from "react";
 import { ResourceDeleteModal } from "@/components/resource-delete-modal";
@@ -24,24 +25,17 @@ interface ReleasesPageContentProps {
 }
 
 export function ReleasesPageContent({ releases }: ReleasesPageContentProps) {
-  const [
-    isReleaseDeleteModalOpen,
-    { open: openReleaseDeleteModal, close: closeReleaseDeleteModal },
-  ] = useDisclosure(false);
-  const [
-    isReleaseUpsertModalOpen,
-    { open: openReleaseUpsertModal, close: closeReleaseUpsertModal },
-  ] = useDisclosure(false);
+  const modalStack = useModalsStack(["release-delete", "release-upsert"]);
   const [releaseToEditID, setReleaseToEditID] = useState<number | null>(null);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   function upsertRelease(id: number) {
     setReleaseToEditID(id);
-    openReleaseUpsertModal();
+    modalStack.open("release-upsert");
   }
 
   function clearReleaseUpsert() {
-    closeReleaseUpsertModal();
+    modalStack.closeAll();
     setReleaseToEditID(null);
   }
 
@@ -50,7 +44,7 @@ export function ReleasesPageContent({ releases }: ReleasesPageContentProps) {
       <Group align="flex-end" gap="sm">
         <ActionIcon
           aria-label="Adicionar lançamento"
-          onClick={openReleaseUpsertModal}
+          onClick={() => modalStack.open("release-upsert")}
           variant="filled"
           color="teal"
           size="input-sm"
@@ -63,7 +57,7 @@ export function ReleasesPageContent({ releases }: ReleasesPageContentProps) {
             aria-label="Deletar lançamento(s)"
             variant="outline"
             color="red"
-            onClick={openReleaseDeleteModal}
+            onClick={() => modalStack.open("release-delete")}
             size="input-sm"
           >
             <Trash size={16} />
@@ -152,91 +146,91 @@ export function ReleasesPageContent({ releases }: ReleasesPageContentProps) {
         </Table.Tbody>
       </Table>
 
-      <Modal
-        opened={isReleaseUpsertModalOpen}
-        centered
-        onClose={clearReleaseUpsert}
-        title={releaseToEditID ? "Editar lançamento" : "Adicionar lançamento"}
-      >
-        <Stack component="form" onSubmit={clearReleaseUpsert}>
-          <TextInput
-            defaultValue={
-              releaseToEditID ? releases.find(({ id }) => id == releaseToEditID)?.title : ""
-            }
-            label="Título"
-            name="title"
-            required
-            minLength={2}
-          />
+      <ModalStack>
+        <Modal
+          centered
+          {...modalStack.register("release-upsert")}
+          title={releaseToEditID ? "Editar lançamento" : "Adicionar lançamento"}
+        >
+          <Stack component="form" onSubmit={clearReleaseUpsert}>
+            <TextInput
+              defaultValue={
+                releaseToEditID ? releases.find(({ id }) => id == releaseToEditID)?.title : ""
+              }
+              label="Título"
+              name="title"
+              required
+              minLength={2}
+            />
 
-          <NativeSelect
-            defaultValue={
-              releaseToEditID
-                ? String(releases.find(({ id }) => id == releaseToEditID)?.artistId)
-                : ""
-            }
-            label="Artista"
-            name="artist"
-            required
-            data={[
-              { label: "Bring Me The Horizon", value: "1" },
-              { label: "NCT 127", value: "2" },
-              { label: "Asking Alexandria", value: "3" },
-            ]}
-          />
+            <NativeSelect
+              defaultValue={
+                releaseToEditID
+                  ? String(releases.find(({ id }) => id == releaseToEditID)?.artistId)
+                  : ""
+              }
+              label="Artista"
+              name="artist"
+              required
+              data={[
+                { label: "Bring Me The Horizon", value: "1" },
+                { label: "NCT 127", value: "2" },
+                { label: "Asking Alexandria", value: "3" },
+              ]}
+            />
 
-          <NativeSelect
-            defaultValue={
-              releaseToEditID ? releases.find(({ id }) => id == releaseToEditID)?.releaseType : ""
-            }
-            label="Tipo"
-            name="type"
-            required
-            data={[
-              { label: "Álbum", value: "album" },
-              { label: "EP", value: "ep" },
-              { label: "Single", value: "single" },
-            ]}
-          />
+            <NativeSelect
+              defaultValue={
+                releaseToEditID ? releases.find(({ id }) => id == releaseToEditID)?.releaseType : ""
+              }
+              label="Tipo"
+              name="type"
+              required
+              data={[
+                { label: "Álbum", value: "album" },
+                { label: "EP", value: "ep" },
+                { label: "Single", value: "single" },
+              ]}
+            />
 
-          <NumberInput
-            defaultValue={
-              releaseToEditID ? releases.find(({ id }) => id == releaseToEditID)?.length : 1
-            }
-            label="Tamanho"
-            name="length"
-            required
-            min={1}
-            max={99}
-          />
+            <NumberInput
+              defaultValue={
+                releaseToEditID ? releases.find(({ id }) => id == releaseToEditID)?.length : 1
+              }
+              label="Tamanho"
+              name="length"
+              required
+              min={1}
+              max={99}
+            />
 
-          <DateInput label="Data de lançamento" placeholder="08/01/2025" name="releaseDate" />
+            <DateInput label="Data de lançamento" placeholder="08/01/2025" name="releaseDate" />
 
-          <Group align="center" justify="space-between">
-            <Button
-              w="48%"
-              type="button"
-              onClick={closeReleaseUpsertModal}
-              variant="outline"
-              color="red"
-            >
-              Cancelar
-            </Button>
+            <Group align="center" justify="space-between">
+              <Button
+                w="48%"
+                type="button"
+                onClick={modalStack.closeAll}
+                variant="outline"
+                color="red"
+              >
+                Cancelar
+              </Button>
 
-            <Button w="48%" type="submit" variant="filled" color="teal">
-              {releaseToEditID ? "Editar" : "Adicionar"}
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+              <Button w="48%" type="submit" variant="filled" color="teal">
+                {releaseToEditID ? "Editar" : "Adicionar"}
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
 
-      <ResourceDeleteModal
-        opened={isReleaseDeleteModalOpen}
-        onClose={closeReleaseDeleteModal}
-        onConfirm={closeReleaseDeleteModal}
-        title={`Deletar ${selectedRows.length} lançamento${selectedRows.length > 1 ? "s" : ""}?`}
-        description="Ao deletar um lançamento, todos as músicas associados a ele também serão deletadas. A ação não pode ser revertida."
-      />
+        <ResourceDeleteModal
+          {...modalStack.register("release-delete")}
+          onConfirm={modalStack.closeAll}
+          title={`Deletar ${selectedRows.length} lançamento${selectedRows.length > 1 ? "s" : ""}?`}
+          description="Ao deletar um lançamento, todos as músicas associados a ele também serão deletadas. A ação não pode ser revertida."
+        />
+      </ModalStack>
     </>
   );
 }
