@@ -1,5 +1,10 @@
 import { CreateSongForm } from "@/components/create-song-form";
 import { Stack, Title } from "@mantine/core";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Record Keeper Editor | Adicionar música",
+};
 
 export default async function CreateSongPage() {
   return (
