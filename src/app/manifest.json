@@ -1,0 +1,59 @@
+{
+  "name": "Record Keeper Editor",
+  "short_name": "Record Keeper Editor",
+  "description": "Gerencie e edite seus dados do Record Keeper.",
+  "id": "record-keeper-editor",
+  "theme_color": "#1f1f1f",
+  "background_color": "#242424",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/icon64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon92.png",
+      "sizes": "92x92",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
