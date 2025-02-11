@@ -1,4 +1,10 @@
 import { Button, PasswordInput, Stack, TextInput } from "@mantine/core";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Record Keeper Editor",
+  description: "Gerencie e edite seus dados do Record Keeper.",
+};
 
 export default function Home() {
   return (
