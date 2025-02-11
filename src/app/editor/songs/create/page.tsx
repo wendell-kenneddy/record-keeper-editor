@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default async function CreateSongPage() {
   return (
     <Stack component="main" align="flex-start">
-      <Title order={2}>Registre uma nova música</Title>
+      <Title order={2}>Adicionar nova música</Title>
 
       <CreateSongForm />
     </Stack>
