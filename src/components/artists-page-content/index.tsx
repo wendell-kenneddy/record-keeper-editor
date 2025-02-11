@@ -1,8 +1,18 @@
 "use client";
 
 import { Artist } from "@/data/types";
-import { ActionIcon, Button, Checkbox, Group, Modal, Stack, Table, TextInput } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import {
+  ActionIcon,
+  Button,
+  Checkbox,
+  Group,
+  Modal,
+  ModalStack,
+  Stack,
+  Table,
+  TextInput,
+  useModalsStack,
+} from "@mantine/core";
 import { PlusIcon, SquarePen, Trash } from "lucide-react";
 import { useState } from "react";
 import { ResourceDeleteModal } from "../resource-delete-modal";
@@ -12,20 +22,17 @@ interface ArtistsPageContentProps {
 }
 
 export function ArtistsPageContent({ artists }: ArtistsPageContentProps) {
-  const [isArtistDeleteModalOpen, { open: openArtistDeleteModal, close: closeArtistDeleteModal }] =
-    useDisclosure(false);
-  const [isArtistUpsertModalOpen, { open: openArtistUpsertModal, close: closeArtistUpsertModal }] =
-    useDisclosure(false);
+  const modalStack = useModalsStack(["artist-delete", "artist-upsert"]);
   const [artistToEditID, setartistToEditID] = useState<number | null>(null);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   function upsertArtist(id: number) {
     setartistToEditID(id);
-    openArtistUpsertModal();
+    modalStack.open("artist-upsert");
   }
 
   function clearArtistUpsert() {
-    closeArtistUpsertModal();
+    modalStack.closeAll();
     setartistToEditID(null);
   }
 
@@ -35,7 +42,7 @@ export function ArtistsPageContent({ artists }: ArtistsPageContentProps) {
         <ActionIcon
           aria-label="Adicionar artista"
           size="input-sm"
-          onClick={openArtistUpsertModal}
+          onClick={() => modalStack.open("artist-upsert")}
           variant="filled"
           color="teal"
         >
@@ -48,7 +55,7 @@ export function ArtistsPageContent({ artists }: ArtistsPageContentProps) {
             size="input-sm"
             variant="outline"
             color="red"
-            onClick={openArtistDeleteModal}
+            onClick={() => modalStack.open("artist-delete")}
           >
             <Trash size={16} />
           </ActionIcon>
@@ -108,48 +115,54 @@ export function ArtistsPageContent({ artists }: ArtistsPageContentProps) {
         </Table.Tbody>
       </Table>
 
-      <Modal
-        opened={isArtistUpsertModalOpen}
-        centered
-        onClose={clearArtistUpsert}
-        title={artistToEditID ? "Editar artista" : "Adicionar artista"}
-      >
-        <Stack component="form" onSubmit={clearArtistUpsert}>
-          <TextInput
-            defaultValue={String(
-              artistToEditID ? artists.find(({ id }) => id == artistToEditID)?.name : ""
-            )}
-            label="Nome"
-            name="name"
-            required
-            minLength={2}
-          />
+      <ModalStack>
+        <Modal
+          centered
+          {...modalStack.register("artist-upsert")}
+          title={artistToEditID ? "Editar artista" : "Adicionar artista"}
+        >
+          <Stack component="form" onSubmit={clearArtistUpsert}>
+            <TextInput
+              defaultValue={String(
+                artistToEditID ? artists.find(({ id }) => id == artistToEditID)?.name : ""
+              )}
+              label="Nome"
+              name="name"
+              required
+              minLength={2}
+            />
 
-          <Group align="center" justify="space-between">
-            <Button
-              w="48%"
-              type="button"
-              onClick={closeArtistUpsertModal}
-              variant="outline"
-              color="red"
-            >
-              Cancelar
-            </Button>
+            <Group align="center" justify="space-between">
+              <Button
+                w="48%"
+                type="button"
+                onClick={modalStack.closeAll}
+                variant="outline"
+                color="red"
+              >
+                Cancelar
+              </Button>
 
-            <Button w="48%" type="submit" variant="filled" color="teal">
-              {artistToEditID ? "Editar" : "Adicionar"}
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+              <Button
+                onClick={modalStack.closeAll}
+                w="48%"
+                type="submit"
+                variant="filled"
+                color="teal"
+              >
+                {artistToEditID ? "Editar" : "Adicionar"}
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
 
-      <ResourceDeleteModal
-        opened={isArtistDeleteModalOpen}
-        onClose={closeArtistDeleteModal}
-        onConfirm={closeArtistDeleteModal}
-        title={`Deletar ${selectedRows.length} artista${selectedRows.length > 1 ? "s" : ""}?`}
-        description="Ao deletar um artista, todos os lançamentos associados a ele também serão deletados. A ação não pode ser revertida."
-      />
+        <ResourceDeleteModal
+          {...modalStack.register("artist-delete")}
+          title={`Deletar ${selectedRows.length} artista${selectedRows.length > 1 ? "s" : ""}?`}
+          description="Ao deletar um artista, todos os lançamentos associados a ele também serão deletados. A ação não pode ser revertida."
+          onConfirm={modalStack.closeAll}
+        />
+      </ModalStack>
     </>
   );
 }
