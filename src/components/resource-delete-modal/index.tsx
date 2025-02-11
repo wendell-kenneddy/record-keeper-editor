@@ -18,7 +18,7 @@ export function ResourceDeleteModal({
   description,
 }: ResourceDeleteModalProps) {
   return (
-    <Modal centered opened={opened} onClose={close} title={title}>
+    <Modal centered opened={opened} onClose={onClose} title={title}>
       <Stack align="flex-start">
         <Text size="sm">{description}</Text>
 
